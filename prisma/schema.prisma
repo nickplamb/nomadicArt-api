@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Artist {
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  name           String?
+  journalEntries JournalEntry[]
+  city           String
+  state          String
+  postalCode     String
+  country        String
+  coordinates    String[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model JournalEntry {
+  id           Int      @id @default(autoincrement())
+  artPiece     ArtPiece @relation(fields: [artPieceId], references: [id])
+  artPieceId   Int
+  title        String?
+  description  String?
+  materials    String?
+  photoUri     String?
+  dateRecieved DateTime @db.Timestamptz(3)
+  dateSent     DateTime @db.Timestamptz(3)
+  published    Boolean  @default(false)
+  author       Artist   @relation(fields: [authorId], references: [id])
+  authorId     Int
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model ArtPiece {
+  id             Int            @id @default(autoincrement())
+  title          String         @default("untitled")
+  artMedium      String
+  description    String?
+  journalEntries JournalEntry[]
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
+}
